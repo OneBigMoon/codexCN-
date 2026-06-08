@@ -1,0 +1,22 @@
+{
+  "name": "codex-cn-plus-plus",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local Codex Chinese localization patch app with backup and restore.",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node --test test/*.test.js",
+    "build:mac-app": "bash scripts/build-menubar-app.sh",
+    "install:mac-app": "bash scripts/install-menubar-app.sh",
+    "build:launcher-app": "node scripts/build-macos-app.js",
+    "dist:dmg": "bash scripts/build-dmg.sh",
+    "scan": "node src/cli.js scan",
+    "dry-run": "node src/cli.js apply --dry-run",
+    "apply": "node src/cli.js apply",
+    "restore": "node src/cli.js restore"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

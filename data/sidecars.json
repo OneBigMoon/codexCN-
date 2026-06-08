@@ -1,0 +1,24 @@
+{
+  "skills": {
+    "chatgpt-app-submission": {
+      "display_name": "ChatGPT App 提交",
+      "short_description": "检查 ChatGPT Apps 提交材料"
+    },
+    "dogfood": {
+      "display_name": "探索测试",
+      "short_description": "对 Web 应用做探索式 QA：发现问题、证据和报告。"
+    },
+    "yuanbao": {
+      "display_name": "元宝",
+      "short_description": "元宝群组：@ 提及用户，查询信息和成员。"
+    },
+    "control-chrome": {
+      "display_name": "控制 Chrome",
+      "short_description": "控制用户的 Chrome 浏览器"
+    },
+    "computer-use": {
+      "display_name": "电脑控制",
+      "short_description": "通过电脑控制操作本地 Mac 应用"
+    }
+  }
+}

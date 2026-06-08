@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Codex CN++</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <main class="shell">
+      <section class="toolbar" aria-label="Codex CN++ controls">
+        <div>
+          <h1>Codex CN++</h1>
+          <p id="status">本地汉化补丁工具，支持扫描、应用和恢复。</p>
+        </div>
+        <div class="actions">
+          <button id="scanBtn" type="button">扫描</button>
+          <button id="dryRunBtn" type="button">预演</button>
+          <button id="applyBtn" type="button" class="primary">应用汉化</button>
+          <button id="restoreBtn" type="button" class="danger">恢复最近备份</button>
+        </div>
+      </section>
+
+      <section id="progressPanel" class="progressPanel" aria-live="polite" hidden>
+        <div class="progressTrack">
+          <div class="progressBar"></div>
+        </div>
+        <div id="progressText">准备中...</div>
+      </section>
+
+      <section class="metrics" aria-label="Summary">
+        <div><span id="filesCount">0</span><label>扫描文件</label></div>
+        <div><span id="matchedCount">0</span><label>命中文件</label></div>
+        <div><span id="matchesCount">0</span><label>命中文案</label></div>
+        <div><span id="changesCount">0</span><label>可改文件</label></div>
+      </section>
+
+      <section class="panel">
+        <div class="panelHeader">
+          <h2>报告</h2>
+          <button id="backupsBtn" type="button">刷新备份</button>
+        </div>
+        <pre id="report">点击“扫描”开始。</pre>
+      </section>
+
+      <section class="panel">
+        <h2>备份批次</h2>
+        <select id="backupSelect" aria-label="Backup batches"></select>
+      </section>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>
