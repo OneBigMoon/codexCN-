@@ -2,6 +2,36 @@
 
 Codex CN++ 是一个本地汉化补丁 App，用来增强 Codex 插件/技能列表中还没汉化的显示文案。
 
+当前版本：`v0.1.0`
+
+当前 Release 说明：[v0.1.0](docs/releases/v0.1.0.md)
+
+## Releases
+
+当前正式版本：`v0.1.0`
+
+推荐下载：
+
+- `CodexCNPlusPlus-macos.zip`：普通用户推荐，解压后得到 `Codex CN++.app`。
+- `CodexCNPlusPlus-macos-0.1.0.dmg`：DMG 安装包，打开后可拖入 `Applications`。
+- 源码包：适合维护者继续补词典、调整 patch 规则或重新打包。
+
+Release 资产由这些命令生成：
+
+```bash
+npm run build:mac-app
+npm run dist:dmg
+```
+
+生成结果：
+
+```text
+dist/CodexCNPlusPlus-macos.zip
+dist/CodexCNPlusPlus-macos-0.1.0.dmg
+```
+
+如果 Codex 更新后插件/技能列表又变回英文，重新打开 `Codex CN++.app`，点击菜单栏里的 `应用汉化` 即可。
+
 Logo 源文件：
 
 ```text
