@@ -3,6 +3,7 @@ import Foundation
 
 final class CodexCNApp: NSObject, NSApplicationDelegate {
     private let bundledToolRelativePath = "CodexCNPlusPlus/scripts/run-codex-cn.js"
+    private let guiPath = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
     private let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     private let menu = NSMenu()
     private var isRunning = false
@@ -100,9 +101,11 @@ final class CodexCNApp: NSObject, NSApplicationDelegate {
 
     private func runTool(_ command: String) -> (ok: Bool, summary: String) {
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: nodePath())
-        process.arguments = [toolPath(), command]
+        let launch = nodeLaunch(command: command)
+        process.executableURL = launch.executableURL
+        process.arguments = launch.arguments
         process.currentDirectoryURL = URL(fileURLWithPath: toolRoot())
+        process.environment = processEnvironment()
 
         let pipe = Pipe()
         process.standardOutput = pipe
@@ -139,16 +142,35 @@ final class CodexCNApp: NSObject, NSApplicationDelegate {
             .path
     }
 
-    private func nodePath() -> String {
-        if let resourcePath = Bundle.main.resourcePath {
-            let bundled = URL(fileURLWithPath: resourcePath)
-                .appendingPathComponent("node/bin/node")
-                .path
-            if FileManager.default.isExecutableFile(atPath: bundled) {
-                return bundled
+    private func nodeLaunch(command: String) -> (executableURL: URL, arguments: [String]) {
+        for candidate in nodeCandidates() {
+            if FileManager.default.isExecutableFile(atPath: candidate) {
+                return (URL(fileURLWithPath: candidate), [toolPath(), command])
             }
         }
-        return "/usr/bin/env"
+        return (URL(fileURLWithPath: "/usr/bin/env"), ["node", toolPath(), command])
+    }
+
+    private func nodeCandidates() -> [String] {
+        var candidates: [String] = []
+        if let resourcePath = Bundle.main.resourcePath {
+            candidates.append(URL(fileURLWithPath: resourcePath)
+                .appendingPathComponent("node/bin/node")
+                .path)
+        }
+        candidates.append(contentsOf: [
+            "/opt/homebrew/bin/node",
+            "/usr/local/bin/node",
+            "/usr/bin/node",
+        ])
+        return candidates
+    }
+
+    private func processEnvironment() -> [String: String] {
+        var environment = ProcessInfo.processInfo.environment
+        let existingPath = environment["PATH"] ?? ""
+        environment["PATH"] = existingPath.isEmpty ? guiPath : "\(guiPath):\(existingPath)"
+        return environment
     }
 
     private func summarize(_ output: String) -> String {

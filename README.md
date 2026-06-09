@@ -2,18 +2,18 @@
 
 Codex CN++ 是一个本地汉化补丁 App，用来增强 Codex 插件/技能列表中还没汉化的显示文案。
 
-当前版本：`v0.1.1`
+当前版本：`v0.1.2`
 
-当前 Release 说明：[v0.1.1](docs/releases/v0.1.1.md)
+当前 Release 说明：[v0.1.2](docs/releases/v0.1.2.md)
 
 ## Releases
 
-当前正式版本：`v0.1.1`
+当前正式版本：`v0.1.2`
 
 推荐下载：
 
 - `CodexCNPlusPlus-macos.zip`：普通用户推荐，解压后得到 `Codex CN++.app`。
-- `CodexCNPlusPlus-macos-0.1.1.dmg`：DMG 安装包，打开后可拖入 `Applications`。
+- `CodexCNPlusPlus-macos-0.1.2.dmg`：DMG 安装包，打开后可拖入 `Applications`。
 - 源码包：适合维护者继续补词典、调整 patch 规则或重新打包。
 
 Release 资产由这些命令生成：
@@ -27,10 +27,18 @@ npm run dist:dmg
 
 ```text
 dist/CodexCNPlusPlus-macos.zip
-dist/CodexCNPlusPlus-macos-0.1.1.dmg
+dist/CodexCNPlusPlus-macos-0.1.2.dmg
 ```
 
 如果 Codex 更新后插件/技能列表又变回英文，重新打开 `Codex CN++.app`，点击菜单栏里的 `应用汉化` 即可。
+
+## 其他人也能用的保障
+
+- App 内置补丁工具、词典、Logo、网页界面和构建时可用的 Node 运行时。
+- 运行时使用用户自己的 `$HOME/.codex`，不会写死维护者电脑上的 `/Users/x` 路径。
+- 如果内置 Node 不可用，会继续查找 `/opt/homebrew/bin/node`、`/usr/local/bin/node`、`/usr/bin/node`，最后再用 `/usr/bin/env node` 兜底。
+- 每次应用汉化前都会备份，菜单里支持恢复最近备份。
+- Release 包含 zip 和 dmg 两种安装方式，并在发布前跑测试、dry-run、签名和安装包检查。
 
 Logo 源文件：
 

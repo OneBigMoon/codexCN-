@@ -437,6 +437,10 @@ test('project contains Claude_CN-style macOS menubar packaging files', () => {
   assert.match(swift, /应用汉化/);
   assert.match(swift, /恢复最近备份/);
   assert.match(swift, /CodexCNPlusPlus\/scripts\/run-codex-cn\.js/);
+  assert.match(swift, /nodeCandidates\(\)/);
+  assert.match(swift, /\/opt\/homebrew\/bin\/node/);
+  assert.match(swift, /\["node", toolPath\(\), command\]/);
+  assert.match(swift, /processEnvironment\(\)/);
   assert.match(buildScript, /generate-macos-icon\.swift/);
   assert.match(buildScript, /CodexCNPlusPlus\.icns/);
   assert.match(buildScript, /TOOL_DIR="\$RESOURCES_DIR\/CodexCNPlusPlus"/);
