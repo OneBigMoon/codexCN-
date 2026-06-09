@@ -1,6 +1,6 @@
 {
   "name": "codex-cn-plus-plus",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "private": true,
   "description": "Local Codex Chinese localization patch app with backup and restore.",
   "main": "src/server.js",

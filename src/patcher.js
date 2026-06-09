@@ -35,6 +35,9 @@ const FRONTEND_BYTE_PATCHES = [
   ['Explore and prototype ideas', '探索并原型化想法   '],
   ['Design and prototype better flows', '设计原型化流程            '],
   ['Create polished campaign visuals', '创建精美营销视觉        '],
+  ['Prepare sales work faster', '更快准备销售工作 '],
+  ['Communication', '沟通协作 '],
+  ['Developer Tools', '开发工具   '],
   ['Build deal materials faster', '更快制作交易材料   '],
   ['Execute deals with confidence', '自信执行交易           '],
 ];
@@ -54,6 +57,7 @@ function createPatcher(options = {}) {
   const sidecars = options.sidecars || loadSidecars();
   const strings = translations.strings || {};
   const scanRoots = options.scanRoots || [
+    'cache/codex_app_directory',
     '.tmp/plugins',
     '.tmp/bundled-marketplaces',
     'plugins/cache',
@@ -204,7 +208,7 @@ function walk(currentPath, results) {
   }
   if (!stat.isFile()) return;
   const base = path.basename(currentPath);
-  if (SUPPORTED_BASENAMES.has(base)) {
+  if (isSupportedFile(currentPath)) {
     results.push(currentPath);
   }
 }
@@ -215,8 +219,8 @@ function analyzeFile(filePath, strings) {
   }
   const before = fs.readFileSync(filePath, 'utf8');
   const base = path.basename(filePath);
-  const result = base === 'plugin.json' || base === 'skills-curated-cache.json'
-    ? patchJson(before, strings)
+  const result = base === 'plugin.json' || base === 'skills-curated-cache.json' || isAppDirectoryCacheFile(filePath)
+    ? patchJson(before, strings, { fallback: !isAppDirectoryCacheFile(filePath) })
     : base === 'SKILL.md'
       ? patchSkillMarkdown(before, strings)
       : base === 'openai.yaml'
@@ -231,6 +235,17 @@ function analyzeFile(filePath, strings) {
     matches: result.matches,
     replacements: result.replacements,
   };
+}
+
+function isSupportedFile(filePath) {
+  const base = path.basename(filePath);
+  return SUPPORTED_BASENAMES.has(base) || isAppDirectoryCacheFile(filePath);
+}
+
+function isAppDirectoryCacheFile(filePath) {
+  const normalized = path.normalize(filePath);
+  return path.basename(normalized).endsWith('.json')
+    && normalized.includes(`${path.sep}cache${path.sep}codex_app_directory${path.sep}`);
 }
 
 function analyzeAppArchive(filePath) {
@@ -277,7 +292,7 @@ function findMissingSidecars(files, sidecars) {
   return reports;
 }
 
-function patchJson(text, strings) {
+function patchJson(text, strings, options = {}) {
   let data;
   try {
     data = JSON.parse(text);
@@ -286,7 +301,7 @@ function patchJson(text, strings) {
   }
   const replacements = [];
   const context = buildJsonPatchContext(data, strings);
-  const patched = patchJsonValue(data, strings, replacements, [], context);
+  const patched = patchJsonValue(data, strings, replacements, [], context, options);
   if (replacements.length === 0) {
     return {
       text,
@@ -301,19 +316,19 @@ function patchJson(text, strings) {
   };
 }
 
-function patchJsonValue(value, strings, replacements, pathParts, context) {
+function patchJsonValue(value, strings, replacements, pathParts, context, options = {}) {
   if (typeof value === 'string') {
     const key = pathParts[pathParts.length - 1];
     if (SKIP_KEYS.has(key)) return value;
-    return translateString(value, strings, replacements, pathParts, context);
+    return translateString(value, strings, replacements, pathParts, context, options);
   }
   if (Array.isArray(value)) {
-    return value.map((item, index) => patchJsonValue(item, strings, replacements, pathParts.concat(String(index)), context));
+    return value.map((item, index) => patchJsonValue(item, strings, replacements, pathParts.concat(String(index)), context, options));
   }
   if (value && typeof value === 'object') {
     const next = {};
     for (const [key, item] of Object.entries(value)) {
-      next[key] = patchJsonValue(item, strings, replacements, pathParts.concat(key), context);
+      next[key] = patchJsonValue(item, strings, replacements, pathParts.concat(key), context, options);
     }
     return next;
   }
@@ -435,7 +450,7 @@ function patchAppArchive(buffer) {
   };
 }
 
-function translateString(value, strings, replacements, pathParts = [], context = {}) {
+function translateString(value, strings, replacements, pathParts = [], context = {}, options = {}) {
   if (Object.prototype.hasOwnProperty.call(strings, value)) {
     const translated = strings[value];
     if (translated !== value) {
@@ -443,6 +458,7 @@ function translateString(value, strings, replacements, pathParts = [], context =
     }
     return translated;
   }
+  if (options.fallback === false) return value;
   const fallback = fallbackJsonDisplayString(value, pathParts, context, strings);
   if (fallback && fallback !== value) {
     replacements.push({ from: value, to: fallback });

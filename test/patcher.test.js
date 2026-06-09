@@ -359,6 +359,47 @@ test('apply can create sidecars in configured extra skill roots', async () => {
   assert.equal(fs.existsSync(sidecarPath), false);
 });
 
+test('apply patches Codex app directory cache with exact translations only', async () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-cn-test-'));
+  const codexHome = path.join(root, '.codex');
+  const directoryDir = path.join(codexHome, 'cache/codex_app_directory');
+  fs.mkdirSync(directoryDir, { recursive: true });
+  const directoryPath = path.join(directoryDir, 'catalog.json');
+  fs.writeFileSync(directoryPath, JSON.stringify({
+    schema_version: 1,
+    connectors: [
+      {
+        id: 'known',
+        name: 'Sales',
+        description: 'Prepare sales work faster',
+        labels: {
+          category: 'Business & Operations',
+        },
+        appMetadata: {
+          tagline: 'Create marketing visuals from a brief or product image.',
+        },
+      },
+      {
+        id: 'unknown',
+        name: 'Coffee App',
+        description: 'Order coffee from a local cafe',
+      },
+    ],
+  }, null, 2));
+
+  const patcher = createPatcher({ codexHome, projectRoot: root, extraRoots: [] });
+  const scanResult = await patcher.scan();
+  assert.equal(scanResult.files.some((file) => file.path === directoryPath), true);
+
+  await patcher.apply();
+  const patched = JSON.parse(fs.readFileSync(directoryPath, 'utf8'));
+  assert.equal(patched.connectors[0].name, 'Sales');
+  assert.equal(patched.connectors[0].description, '更快准备销售工作');
+  assert.equal(patched.connectors[0].labels.category, '业务与运营');
+  assert.equal(patched.connectors[0].appMetadata.tagline, '根据简报或产品图片创建营销视觉素材。');
+  assert.equal(patched.connectors[1].description, 'Order coffee from a local cafe');
+});
+
 test('apply patches Codex frontend app archive with byte-safe replacements and restore works', async () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-cn-test-'));
   const codexHome = path.join(root, '.codex');
@@ -369,6 +410,9 @@ test('apply patches Codex frontend app archive with byte-safe replacements and r
     'return n.length>0?[{section:{id:`plugins-featured`,title:`Featured`},plugins:n},...a]:a}',
     'description:`Short Product Design plugin description shown in the work plugins announcement modal`',
     'description:`Short Public Equity Investing plugin description shown in the work plugins announcement modal`',
+    'description:`Prepare sales work faster`',
+    'category:`Communication`',
+    'category:`Developer Tools`',
   ].join('\n');
   fs.writeFileSync(appArchivePath, before);
 
@@ -390,6 +434,12 @@ test('apply patches Codex frontend app archive with byte-safe replacements and r
   assert.match(after, /产品设计  /);
   assert.doesNotMatch(after, /Public Equity Investing/);
   assert.match(after, /公开股票投资     /);
+  assert.doesNotMatch(after, /Prepare sales work faster/);
+  assert.match(after, /更快准备销售工作 /);
+  assert.doesNotMatch(after, /Communication/);
+  assert.match(after, /沟通协作 /);
+  assert.doesNotMatch(after, /Developer Tools/);
+  assert.match(after, /开发工具   /);
 
   const restoreResult = await patcher.restore({ batchId: applyResult.backupBatch.id });
   assert.equal(restoreResult.restoredFiles.includes(appArchivePath), true);
