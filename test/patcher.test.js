@@ -495,6 +495,24 @@ test('translation data covers the pasted plugin marketplace copy', () => {
   assert.deepEqual(missing, []);
 });
 
+test('translation data covers the updated plugin marketplace categories', () => {
+  const translations = loadTranslations().strings;
+  const required = {
+    'Business & Operations': '业务与运营',
+    Communication: '沟通协作',
+    Creativity: '创意',
+    'Data & Analytics': '数据与分析',
+    'Developer Tools': '开发者工具',
+    'Education & Research': '教育与研究',
+    Finance: '金融',
+    Other: '其他',
+    Productivity: '效率',
+  };
+  for (const [from, to] of Object.entries(required)) {
+    assert.equal(translations[from], to);
+  }
+});
+
 test('translation data covers visible plugin descriptions from local marketplace cache', () => {
   const roots = [
     '/Users/x/.codex/.tmp/plugins/plugins',

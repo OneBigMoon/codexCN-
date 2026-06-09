@@ -515,11 +515,19 @@ function fallbackPrompt(value, displayName) {
 
 function fallbackCategory(value) {
   const categories = {
+    'Business & Operations': '业务与运营',
     Coding: '开发编程',
+    Communication: '沟通协作',
+    Creativity: '创意',
+    'Data & Analytics': '数据与分析',
+    'Developer Tools': '开发者工具',
+    Design: '设计',
+    'Education & Research': '教育与研究',
     Engineering: '工程开发',
+    Finance: '金融',
+    Other: '其他',
     Productivity: '效率',
     Research: '研究',
-    Design: '设计',
     Lifestyle: '生活方式',
     Security: '安全',
   };
